@@ -1,0 +1,47 @@
+version: '3.0'
+services:
+  nginx:
+    container_name: nginx
+    build:
+      context: Dockerfile/
+      dockerfile: nginx-Dockerfile
+    networks:
+      - lnmp
+    ports:
+      - 8080:80
+    volumes:
+      - ./config/nginx.conf:/usr/local/nginx/conf/nginx.conf
+      - ./volume:/usr/share/nginx/html
+    depends_on:
+      - php
+      - mysql
+
+  php:
+    image: jianghu/myphp:1.0
+    container_name: php
+    restart: always
+    networks:
+      - lnmp
+    volumes:
+      - ./volume:/var/www/html:rw
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    volumes:
+      - mysql-data:/var/lib/mysql/:rw
+    restart: always
+    networks:
+      - lnmp
+    environment:
+      MYSQL_ROOT_PASSWORD: "Abcd@123456"
+      TZ: "Asia/Shanghai"
+
+networks:
+  lnmp:
+    external: 
+      true
+volumes:
+  mysql-data:

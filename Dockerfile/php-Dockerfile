@@ -1,0 +1,18 @@
+FROM centos:7
+RUN yum install -y gcc gcc-c++ make gd-devel sqlite-devel libxml2-devel libcurl-devel libjpeg-devel libpng-devel openssl-devel \
+    && yum clean all \
+    && yum makecache
+ADD https://www.php.net/distributions/php-7.4.27.tar.gz /usr/local
+RUN cd /usr/local \
+    && tar -xf php-7.4.27.tar.gz \
+    && cd php-7.4.27 \
+    && ./configure --prefix=/usr/local/php \
+    --with-config-file-path=/usr/local/php/etc \
+    --enable-mysqlnd --with-mysql --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd \
+    --with-openssl --with-zlib --with-curl --with-gd \
+    --with-jpeg-dir --with-png-dir --with-iconv \
+    --enable-fpm --enable-zip --enable-mbstring \
+    && make && make install
+WORKDIR /usr/local/php
+EXPOSE 9000
+CMD ["./sbin/php-fpm"]
